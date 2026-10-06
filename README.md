@@ -27,3 +27,7 @@ Use `▶ Iniciar jornada`; o cronômetro continua mesmo se a página for recarre
 
 ### Importante
 V1 pessoal, sem autenticação multiusuário. Não use como SaaS público sem adicionar autenticação e proteção da API.
+
+
+## V2.1 Piloto
+PWA básico, identificação do motorista, conexão amigável, validações e proteção local contra reenvio duplicado.

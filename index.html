@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <meta name="theme-color" content="#07111f"/>
   <title>DriveControl • Painel do Motorista</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="manifest" href="manifest.webmanifest"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/><link rel="stylesheet" href="style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body>
@@ -36,7 +36,7 @@
   </aside>
 
   <main>
-    <header><button id="menu">☰</button><div><h1 id="pageTitle">Dashboard</h1><p>Visão gerencial da sua operação</p></div><div class="today" id="today"></div></header>
+    <header><button id="menu">☰</button><div><h1 id="pageTitle">Dashboard</h1><p>Visão gerencial da sua operação</p></div><div class="driver-head"><b id="driverHello">Olá, Motorista 👋</b><span class="today" id="today"></span></div></header>
 
     <section class="page active" id="dashboard">
       <div class="hero">
@@ -162,7 +162,7 @@
             <button class="primary" type="submit">Salvar manutenção</button>
           </form>
         </article>
-        <article class="panel"><div class="panel-head"><div><h3>Histórico de manutenções</h3><p>Trocas e custos já registrados • 🟢 OK • 🟡 Atenção • 🔴 Vencido</p></div></div><div id="maintenanceList" class="maintenance-list"></div></article>
+        <article class="panel"><div class="panel-head"><div><h3>Central de alertas</h3><p>🟢 OK • 🟡 Atenção • 🔴 Vencido</p></div></div><div id="maintenanceList" class="maintenance-list"></div></article>
       </div>
     </section>
 
@@ -170,7 +170,7 @@
       <article class="form-card narrow"><div class="form-title"><div><h2>Metas e configurações</h2><p>Defina os parâmetros do seu painel.</p></div></div>
       <form id="formConfig">
         <div class="form-grid">
-          <label>Meta líquida diária (R$)<input type="number" name="metaDiaria" value="200"></label>
+          <label>Nome do motorista<input type="text" id="driverName" placeholder="Ex.: Sidney"></label><label>Meta líquida diária (R$)<input type="number" name="metaDiaria" value="200"></label>
           <label>Meta líquida mensal (R$)<input type="number" name="metaMensal" value="4400"></label>
           <label>Reserva manutenção por KM (R$)<input type="number" step=".01" name="reservaKm" value=".12"></label>
         </div>
@@ -178,7 +178,7 @@
         <button class="primary" type="submit">Salvar configurações</button>
       </form></article>
       <article class="form-card narrow"><h3>Conexão Google Sheets</h3><p class="hint">Cole abaixo a URL /exec da implantação do Apps Script. Ela fica salva somente neste navegador.</p>
-      <div class="api-row"><input id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec"><button id="saveApi" class="primary">Conectar</button></div></article>
+      <div class="api-status-card"><span id="apiFriendlyStatus">🔴 Base não configurada</span><button type="button" id="toggleApi" class="ghost">Trocar conexão</button></div><div class="api-row" id="apiEditor"><input id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec"><button id="saveApi" class="primary">Conectar</button></div></article>
     </section>
   </main>
 </div>
