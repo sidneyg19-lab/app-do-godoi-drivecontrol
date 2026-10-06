@@ -58,7 +58,14 @@ function renderVehicle(){
   const sorted=maintenances.map(m=>({m,s:maintenanceStatus(m)})).sort((a,b)=>({danger:0,warn:1,ok:2}[a.s.level]-({danger:0,warn:1,ok:2}[b.s.level])));
   $('#vProxima').textContent=sorted.length?`${sorted[0].m.item}: ${sorted[0].s.text}`:'Cadastre manutenção';
   const markup=sorted.length?sorted.map(({m,s})=>`<div class="health"><div><b>${s.level==='danger'?'🔴':s.level==='warn'?'🟡':'🟢'} ${m.item}</b><br><small>${s.detail}${m.custo?` • ${money(m.custo)}`:''}</small></div><strong class="status-${s.level}">${s.text}</strong></div>`).join(''):'<p class="hint">Nenhuma manutenção cadastrada ainda.</p>';
-  $('#healthList').innerHTML=markup; $('#maintenanceList').innerHTML=markup;
+  $('#healthList').innerHTML=markup;
+  const history=[...maintenances].reverse();
+  $('#maintenanceList').innerHTML=history.length?history.map(m=>{
+    const s=maintenanceStatus(m);
+    const data=m.ultimaData?m.ultimaData.split('-').reverse().join('/'):'—';
+    const km=num(m.ultimoKm).toLocaleString('pt-BR');
+    return `<div class="maintenance-item"><div><b>${s.level==='danger'?'🔴':s.level==='warn'?'🟡':'🟢'} ${m.item}</b><br><small>Última troca: ${km} km • ${data}${m.custo?` • ${money(m.custo)}`:''}</small><br><small>${s.detail}</small></div><strong class="status-${s.level}">${s.text}</strong></div>`;
+  }).join(''):'<p class="hint">Nenhuma manutenção cadastrada ainda.</p>';
   let f=$('#formVehicle'); if(vehicle&&Object.keys(vehicle).length) Object.keys(vehicle).forEach(k=>{if(f[k])f[k].value=vehicle[k]??''});
 }
 function calcStreak(){
@@ -85,8 +92,42 @@ function updateJourney(){
 }
 $('#startJourney').onclick=()=>{localStorage.setItem('dc_journey_start',Date.now());updateJourney();journeyInterval=setInterval(updateJourney,1000);toast('Jornada iniciada 🔥')};
 $('#stopJourney').onclick=()=>{let st=num(localStorage.getItem('dc_journey_start'));if(!st)return;let a=new Date(st),b=new Date(),fmt=d=>`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;let f=$('#formLanc');f.data.value=new Date().toISOString().slice(0,10);f.inicio.value=fmt(a);f.fim.value=fmt(b);localStorage.removeItem('dc_journey_start');clearInterval(journeyInterval);$('#journeyStatus').textContent='Jornada encerrada. Complete ganhos, KM e custos.';$('#startJourney').disabled=false;$('#stopJourney').disabled=true;updateJourney();document.querySelector('[data-page="novo"]').click();toast('Horários preenchidos automaticamente')};
-$('#formVehicle').onsubmit=async e=>{e.preventDefault();vehicle=Object.fromEntries(new FormData(e.currentTarget));try{await call('vehicle',{vehicle});toast('Veículo salvo 🚘');renderVehicle()}catch(err){toast(err.message)}};
-$('#formMaintenance').onsubmit=async e=>{e.preventDefault();let maintenance=Object.fromEntries(new FormData(e.currentTarget));try{await call('maintenance',{maintenance});toast('Manutenção salva 🔧');e.currentTarget.reset();e.currentTarget.custo.value=0;await load()}catch(err){toast(err.message)}};
+$('#formVehicle').onsubmit=async e=>{
+  e.preventDefault();
+  const form=e.currentTarget, btn=form.querySelector('button[type="submit"]');
+  if(btn.disabled)return;
+  vehicle=Object.fromEntries(new FormData(form));
+  const originalText=btn.textContent;
+  try{
+    btn.disabled=true; btn.textContent='Salvando...';
+    await call('vehicle',{vehicle});
+    toast('Veículo salvo 🚘');
+    await load();
+  }catch(err){toast('Erro ao salvar: '+err.message)}
+  finally{btn.disabled=false;btn.textContent=originalText}
+};
+$('#formMaintenance').onsubmit=async e=>{
+  e.preventDefault();
+  const form=e.currentTarget;
+  const btn=form.querySelector('button[type="submit"]');
+  if(btn.disabled)return;
+  const maintenance=Object.fromEntries(new FormData(form));
+  const originalText=btn.textContent;
+  try{
+    btn.disabled=true;
+    btn.textContent='Salvando...';
+    await call('maintenance',{maintenance});
+    toast('Manutenção salva 🔧');
+    form.reset();
+    if(form.elements.custo) form.elements.custo.value=0;
+    await load();
+  }catch(err){
+    toast('Erro ao salvar: '+err.message);
+  }finally{
+    btn.disabled=false;
+    btn.textContent=originalText;
+  }
+};
 if(localStorage.getItem('dc_journey_start')){updateJourney();journeyInterval=setInterval(updateJourney,1000)}
 
 $('#today').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
