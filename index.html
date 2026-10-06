@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="theme-color" content="#07111f"/>
+  <title>DriveControl • Painel do Motorista</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="logo">DC</div><div><b>DriveControl</b><small>Gestão Uber & 99</small></div></div>
+    <nav>
+      <button class="nav active" data-page="dashboard">▦ <span>Dashboard</span></button>
+      <button class="nav" data-page="jornada">▶ <span>Jornada</span></button>
+      <button class="nav" data-page="novo">＋ <span>Novo lançamento</span></button>
+      <button class="nav" data-page="historico">≡ <span>Histórico</span></button>
+      <button class="nav" data-page="veiculo">🚘 <span>Veículo</span></button>
+      <button class="nav" data-page="manutencoes">🔧 <span>Manutenções</span></button>
+      <button class="nav" data-page="metas">◎ <span>Metas</span></button>
+    </nav>
+    <div class="side-title">FILTROS</div>
+    <label>Ano<select id="fAno"><option value="">Todos</option></select></label>
+    <label>Mês<select id="fMes">
+      <option value="">Todos</option><option value="1">Janeiro</option><option value="2">Fevereiro</option>
+      <option value="3">Março</option><option value="4">Abril</option><option value="5">Maio</option>
+      <option value="6">Junho</option><option value="7">Julho</option><option value="8">Agosto</option>
+      <option value="9">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+    </select></label>
+    <label>Plataforma<select id="fPlat"><option value="">Todas</option><option>Uber</option><option>99</option><option>Uber + 99</option></select></label>
+    <label>Dia da semana<select id="fDia"><option value="">Todos</option><option>domingo</option><option>segunda-feira</option><option>terça-feira</option><option>quarta-feira</option><option>quinta-feira</option><option>sexta-feira</option><option>sábado</option></select></label>
+    <button class="ghost" id="limparFiltros">Limpar filtros</button>
+    <div class="connection"><i id="dot"></i><span id="status">Configure a API</span></div>
+  </aside>
+
+  <main>
+    <header><button id="menu">☰</button><div><h1 id="pageTitle">Dashboard</h1><p>Visão gerencial da sua operação</p></div><div class="today" id="today"></div></header>
+
+    <section class="page active" id="dashboard">
+      <div class="hero">
+        <div><span>RESULTADO DO PERÍODO</span><h2 id="heroLucro">R$ 0,00</h2><p id="heroSub">Lucro líquido operacional</p></div>
+        <div class="goal"><span>Meta mensal</span><b id="goalText">0%</b><div class="bar"><i id="goalBar"></i></div></div>
+      </div>
+      <div class="vehicle-strip">
+        <div><span>🚘 KM atual</span><strong id="vKmAtual">0 km</strong></div>
+        <div><span>🔧 Próxima manutenção</span><strong id="vProxima">Cadastre o veículo</strong></div>
+        <div><span>🔥 Sequência de metas</span><strong id="vStreak">0 dias</strong></div>
+        <div><span>🎯 Falta hoje</span><strong id="vFaltaMeta">R$ 200,00</strong></div>
+      </div>
+      <div class="cards">
+        <article><span>Faturamento</span><strong id="kReceita">R$ 0</strong><small>Uber + 99 + extras</small></article>
+        <article><span>Lucro líquido</span><strong id="kLucro">R$ 0</strong><small>Após despesas</small></article>
+        <article><span>Despesas</span><strong id="kDesp">R$ 0</strong><small>Custos registrados</small></article>
+        <article><span>Horas rodadas</span><strong id="kHoras">0h</strong><small>Tempo total</small></article>
+        <article><span>KM rodados</span><strong id="kKm">0 km</strong><small>Quilometragem</small></article>
+        <article><span>Lucro / hora</span><strong id="kHora">R$ 0</strong><small>Eficiência</small></article>
+        <article><span>Lucro / km</span><strong id="kKmR">R$ 0</strong><small>Rentabilidade</small></article>
+        <article><span>Média líquida / dia</span><strong id="kMedia">R$ 0</strong><small>Meta diária: <b id="metaDiariaLabel">R$ 200</b></small></article>
+      </div>
+      <div class="grid2">
+        <article class="panel"><div class="panel-head"><div><h3>Evolução diária</h3><p>Receita x lucro</p></div></div><canvas id="chartDaily"></canvas></article>
+        <article class="panel"><div class="panel-head"><div><h3>Composição das despesas</h3><p>Onde o dinheiro está indo</p></div></div><canvas id="chartExpenses"></canvas></article>
+      </div>
+      <div class="grid2">
+        <article class="panel"><div class="panel-head"><div><h3>Uber x 99</h3><p>Receita por plataforma</p></div></div><canvas id="chartApps"></canvas></article>
+        <article class="panel"><div class="panel-head"><div><h3>Melhores dias</h3><p>Lucro por hora</p></div></div><div id="ranking" class="ranking"></div></article>
+      </div>
+    </section>
+
+
+    <section class="page" id="jornada">
+      <article class="journey-card">
+        <span class="eyebrow">MODO CORRIDA</span>
+        <h2>⏱️ Jornada de hoje</h2>
+        <div id="journeyTimer" class="timer">00:00:00</div>
+        <p id="journeyStatus">Pronto para começar?</p>
+        <div class="journey-actions">
+          <button class="primary" id="startJourney">▶ Iniciar jornada</button>
+          <button class="danger-btn" id="stopJourney" disabled>■ Encerrar jornada</button>
+        </div>
+        <div class="mini-goal"><span>Meta diária</span><b id="journeyGoal">R$ 200,00</b></div>
+        <p class="hint">Ao encerrar, o horário inicial e final são enviados automaticamente para Novo lançamento.</p>
+      </article>
+    </section>
+
+    <section class="page" id="novo">
+      <article class="form-card">
+        <div class="form-title"><div><h2>Novo lançamento diário</h2><p>Preencha ao terminar seu período de trabalho.</p></div><span class="badge">≈ 1 minuto</span></div>
+        <form id="formLanc">
+          <div class="form-grid">
+            <label>Data<input type="date" name="data" required></label>
+            <label>Plataforma<select name="plataforma"><option>Uber + 99</option><option>Uber</option><option>99</option></select></label>
+            <label>Início<input type="time" name="inicio" required></label>
+            <label>Fim<input type="time" name="fim" required></label>
+            <label>KM inicial<input type="number" step=".1" name="kmInicial" required></label>
+            <label>KM final<input type="number" step=".1" name="kmFinal" required></label>
+          </div>
+          <h3>Receitas</h3>
+          <div class="form-grid">
+            <label>Ganhos Uber (R$)<input type="number" step=".01" name="uber" value="0"></label>
+            <label>Ganhos 99 (R$)<input type="number" step=".01" name="noventaNove" value="0"></label>
+            <label>Gorjetas / bônus (R$)<input type="number" step=".01" name="extras" value="0"></label>
+          </div>
+          <h3>Custos do dia</h3>
+          <div class="form-grid">
+            <label>Combustível (R$)<input type="number" step=".01" name="combustivel" value="0"></label>
+            <label>Litros abastecidos<input type="number" step=".001" name="litros" value="0"></label>
+            <label>Lavagem (R$)<input type="number" step=".01" name="lavagem" value="0"></label>
+            <label>Estacionamento / pedágio<input type="number" step=".01" name="estacionamento" value="0"></label>
+            <label>Manutenção (R$)<input type="number" step=".01" name="manutencao" value="0"></label>
+            <label>Outros gastos (R$)<input type="number" step=".01" name="outros" value="0"></label>
+          </div>
+          <label>Observações<textarea name="observacoes" rows="3" placeholder="Ex.: chuva, trânsito, evento, corrida longa..."></textarea></label>
+          <div class="preview" id="preview"></div>
+          <button class="primary" type="submit">Salvar lançamento</button>
+        </form>
+      </article>
+    </section>
+
+    <section class="page" id="historico">
+      <article class="panel"><div class="panel-head"><div><h3>Histórico de lançamentos</h3><p>Use os filtros laterais para analisar períodos.</p></div><button class="ghost" id="exportCsv">Exportar CSV</button></div>
+      <div class="table-wrap"><table><thead><tr><th>Data</th><th>Plataforma</th><th>Horas</th><th>KM</th><th>Receita</th><th>Despesas</th><th>Lucro</th><th>R$/h</th></tr></thead><tbody id="tbody"></tbody></table></div></article>
+    </section>
+
+
+    <section class="page" id="veiculo">
+      <div class="grid2">
+        <article class="form-card">
+          <div class="form-title"><div><h2>🚘 Meu veículo</h2><p>Dados para custo e manutenção.</p></div></div>
+          <form id="formVehicle">
+            <div class="form-grid">
+              <label>Apelido<input name="apelido" placeholder="Ex.: Polo"></label>
+              <label>Modelo<input name="modelo" placeholder="Volkswagen Polo"></label>
+              <label>Ano<input type="number" name="ano" placeholder="2026"></label>
+              <label>Placa<input name="placa" placeholder="ABC1D23"></label>
+              <label>KM atual<input type="number" step=".1" name="kmAtual" required></label>
+              <label>Consumo médio km/l<input type="number" step=".1" name="consumo" placeholder="12.5"></label>
+            </div>
+            <button class="primary" type="submit">Salvar veículo</button>
+          </form>
+        </article>
+        <article class="panel"><div class="panel-head"><div><h3>Saúde do veículo</h3><p>Alertas calculados pelo KM atual e datas.</p></div></div><div id="healthList" class="health-list"></div></article>
+      </div>
+    </section>
+
+    <section class="page" id="manutencoes">
+      <div class="grid2">
+        <article class="form-card">
+          <div class="form-title"><div><h2>🔧 Nova manutenção</h2><p>Controle trocas e vencimentos.</p></div></div>
+          <form id="formMaintenance">
+            <div class="form-grid">
+              <label>Item<select name="item"><option>Óleo do motor</option><option>Filtro de óleo</option><option>Filtro de ar</option><option>Filtro de cabine</option><option>Pneus / rodízio</option><option>Alinhamento / balanceamento</option><option>Freios</option><option>Bateria</option><option>Correias</option><option>Fluidos</option><option>Seguro</option><option>IPVA</option><option>Licenciamento</option><option>Outro</option></select></label>
+              <label>Último KM<input type="number" step=".1" name="ultimoKm"></label>
+              <label>Próximo KM<input type="number" step=".1" name="proximoKm"></label>
+              <label>Última data<input type="date" name="ultimaData"></label>
+              <label>Próxima data<input type="date" name="proximaData"></label>
+              <label>Custo (R$)<input type="number" step=".01" name="custo" value="0"></label>
+            </div>
+            <label>Observação<textarea name="observacao" rows="3"></textarea></label>
+            <button class="primary" type="submit">Salvar manutenção</button>
+          </form>
+        </article>
+        <article class="panel"><div class="panel-head"><div><h3>Central de alertas</h3><p>🟢 OK • 🟡 Atenção • 🔴 Vencido</p></div></div><div id="maintenanceList" class="maintenance-list"></div></article>
+      </div>
+    </section>
+
+    <section class="page" id="metas">
+      <article class="form-card narrow"><div class="form-title"><div><h2>Metas e configurações</h2><p>Defina os parâmetros do seu painel.</p></div></div>
+      <form id="formConfig">
+        <div class="form-grid">
+          <label>Meta líquida diária (R$)<input type="number" name="metaDiaria" value="200"></label>
+          <label>Meta líquida mensal (R$)<input type="number" name="metaMensal" value="4400"></label>
+          <label>Reserva manutenção por KM (R$)<input type="number" step=".01" name="reservaKm" value=".12"></label>
+        </div>
+        <p class="hint">A reserva por KM permite acompanhar também um lucro real estimado, considerando desgaste futuro do veículo.</p>
+        <button class="primary" type="submit">Salvar configurações</button>
+      </form></article>
+      <article class="form-card narrow"><h3>Conexão Google Sheets</h3><p class="hint">Cole abaixo a URL /exec da implantação do Apps Script. Ela fica salva somente neste navegador.</p>
+      <div class="api-row"><input id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec"><button id="saveApi" class="primary">Conectar</button></div></article>
+    </section>
+  </main>
+</div>
+<div id="toast"></div>
+<div id="celebrate" class="celebrate"><div class="fire">🔥</div><h2>META BATIDA!</h2><p>Mandou bem! Resultado líquido do dia atingido.</p><div class="confetti">🎉 ✨ 🔥 🎊 ✨</div></div>
+<script src="app.js"></script>
+</body></html>
