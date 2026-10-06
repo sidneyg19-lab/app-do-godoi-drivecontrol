@@ -22,7 +22,7 @@ chart('#chartDaily','bar',{labels:ds.map(x=>x.slice(8,10)+'/'+x.slice(5,7)),data
 chart('#chartExpenses','doughnut',{labels:['Combustível','Lavagem','Estac./Pedágio','Manutenção','Outros'],datasets:[{data:['combustivel','lavagem','estacionamento','manutencao','outros'].map(k=>sum(a,k)),borderWidth:0}]},{cutout:'68%'});
 chart('#chartApps','bar',{labels:['Uber','99','Extras'],datasets:[{label:'Receita',data:[sum(a,'uber'),sum(a,'noventaNove'),sum(a,'extras')],borderRadius:8}]})}
 function renderRank(a){let g={};a.forEach(r=>{let d=new Date(r.data+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'long'});g[d]??={l:0,h:0};g[d].l+=r.lucroReal;g[d].h+=r.horas});let x=Object.entries(g).map(([d,v])=>[d,v.h?v.l/v.h:0]).sort((a,b)=>b[1]-a[1]).slice(0,5);$('#ranking').innerHTML=x.length?x.map((v,i)=>`<div class="rank"><i>${i+1}</i><div><b>${v[0]}</b><br><small>rentabilidade por hora</small></div><strong>${money(v[1])}/h</strong></div>`).join(''):'<p class="hint">Cadastre seus primeiros dias para gerar o ranking.</p>'}
-function renderTable(a){$('#tbody').innerHTML=[...a].sort((x,y)=>String(y.data).localeCompare(String(x.data))).map(r=>`<tr><td>${r.data?.split('-').reverse().join('/')||''}</td><td>${r.plataforma||''}</td><td>${r.horas.toFixed(1)}h</td><td>${r.km.toFixed(0)}</td><td>${money(r.receita)}</td><td>${money(r.despesas)}</td><td class="profit">${money(r.lucro)}</td><td>${money(r.horas?r.lucro/r.horas:0)}</td></tr>`).join('')}
+function renderTable(a){$('#tbody').innerHTML=[...a].sort((x,y)=>String(y.data).localeCompare(String(x.data))).map(r=>`<tr><td>${r.data?.split('-').reverse().join('/')||''}</td><td>${r.plataforma||''}</td><td>${r.horas.toFixed(1)}h</td><td>${r.km.toFixed(0)}</td><td>${money(r.receita)}</td><td>${money(r.despesas)}</td><td class="profit">${money(r.lucro)}</td><td class="profit">${money(r.lucroReal)}</td><td>${money(r.horas?r.lucroReal/r.horas:0)}</td></tr>`).join('')}
 function fillConfig(){let f=$('#formConfig');f.metaDiaria.value=config.metaDiaria;f.metaMensal.value=config.metaMensal;f.reservaKm.value=config.reservaKm}
 $$('.nav').forEach(b=>b.onclick=()=>{$$('.nav').forEach(x=>x.classList.remove('active'));b.classList.add('active');$$('.page').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.page).classList.add('active');$('#pageTitle').textContent=b.querySelector('span').textContent;$('#sidebar').classList.remove('open')});
 $('#menu').onclick=()=>$('#sidebar').classList.toggle('open');
@@ -71,6 +71,7 @@ function maintenanceStatus(m){
 }
 function renderVehicle(){
   const km=getKmAtual(); $('#vKmAtual').textContent=km.toLocaleString('pt-BR')+' km';
+  const calcKmEl=$('#vehicleCalculatedKm');if(calcKmEl)calcKmEl.textContent=km.toLocaleString('pt-BR')+' km';
   const sorted=maintenances.map(m=>({m,s:maintenanceStatus(m)})).sort((a,b)=>({danger:0,warn:1,ok:2}[a.s.level]-({danger:0,warn:1,ok:2}[b.s.level])));
   $('#vProxima').textContent=sorted.length?`${sorted[0].m.item}: ${sorted[0].s.text}`:'Cadastre manutenção';
   const markup=sorted.length?sorted.map(({m,s})=>`<div class="health"><div><b>${s.level==='danger'?'🔴':s.level==='warn'?'🟡':'🟢'} ${m.item}</b><br><small>${s.detail}${m.custo?` • ${money(m.custo)}`:''}</small></div><strong class="status-${s.level}">${s.text}</strong></div>`).join(''):'<p class="hint">Nenhuma manutenção cadastrada ainda.</p>';

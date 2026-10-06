@@ -57,3 +57,11 @@ PWA básico, identificação do motorista, conexão amigável, validações e pr
   2. KM final dos lançamentos já registrados.
 - Exemplo validado para o piloto: veículo cadastrado em 34.000 km + último lançamento em 34.150 km = próximo KM inicial 34.150.
 - Não altera cálculos financeiros, API, Apps Script ou estrutura das planilhas.
+
+## V2.2.3 – Consistência do piloto
+- Histórico separa Lucro operacional e Lucro real.
+- R$/h do Histórico usa Lucro real.
+- Veículo preserva o KM cadastrado e mostra KM atual calculado separadamente.
+- O KM atual calculado usa o maior valor entre cadastro do veículo e KM final dos lançamentos.
+- Saúde/manutenção continua usando esse KM efetivo mais recente.
+- Sem alteração em Code.gs, API ou estrutura das planilhas.

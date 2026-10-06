@@ -140,7 +140,7 @@
 
     <section class="page" id="historico">
       <article class="panel"><div class="panel-head"><div><h3>Histórico de lançamentos</h3><p>Use os filtros laterais para analisar períodos.</p></div><button class="ghost" id="exportCsv">Exportar CSV</button></div>
-      <div class="table-wrap"><table><thead><tr><th>Data</th><th>Plataforma</th><th>Horas</th><th>KM</th><th>Receita</th><th>Despesas</th><th>Lucro</th><th>R$/h</th></tr></thead><tbody id="tbody"></tbody></table></div></article>
+      <div class="table-wrap"><table><thead><tr><th>Data</th><th>Plataforma</th><th>Horas</th><th>KM</th><th>Receita</th><th>Despesas</th><th>Lucro operacional</th><th>Lucro real</th><th>R$/h real</th></tr></thead><tbody id="tbody"></tbody></table></div></article>
     </section>
 
 
@@ -154,13 +154,13 @@
               <label>Modelo<input name="modelo" placeholder="Volkswagen Polo"></label>
               <label>Ano<input type="number" name="ano" placeholder="2026"></label>
               <label>Placa<input name="placa" placeholder="ABC1D23"></label>
-              <label>KM atual<input type="number" step=".1" name="kmAtual" required></label>
+              <label>KM cadastrado<input type="number" step=".1" name="kmAtual" required><small class="calculated-km">KM atual calculado: <b id="vehicleCalculatedKm">—</b></small></label>
               <label>Consumo médio km/l<input type="number" step=".1" name="consumo" placeholder="12.5"></label>
             </div>
             <button class="primary" type="submit">Salvar veículo</button>
           </form>
         </article>
-        <article class="panel"><div class="panel-head"><div><h3>Saúde do veículo</h3><p>Alertas calculados pelo KM atual e datas.</p></div></div><div id="healthList" class="health-list"></div></article>
+        <article class="panel"><div class="panel-head"><div><h3>Saúde do veículo</h3><p>Alertas calculados pelo KM mais recente e datas.</p></div></div><div id="healthList" class="health-list"></div></article>
       </div>
     </section>
 
