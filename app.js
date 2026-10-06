@@ -28,7 +28,11 @@ $$('.nav').forEach(b=>b.onclick=()=>{$$('.nav').forEach(x=>x.classList.remove('a
 $('#menu').onclick=()=>$('#sidebar').classList.toggle('open');
 ['fAno','fMes','fPlat','fDia'].forEach(id=>$('#'+id).onchange=render);
 $('#limparFiltros').onclick=()=>{['fAno','fMes','fPlat','fDia'].forEach(id=>$('#'+id).value='');render()};
-$('#formLanc').addEventListener('input',e=>{let o=Object.fromEntries(new FormData(e.currentTarget));let r=calc(o);$('#preview').innerHTML=`<b>Prévia:</b> ${r.horas.toFixed(1)}h • ${r.km.toFixed(1)} km • Receita ${money(r.receita)} • Despesas ${money(r.despesas)} • <b>Lucro ${money(r.lucro)}</b> • Lucro real estimado ${money(r.lucroReal)}`});
+function updateLaunchPreview(form=$('#formLanc')){
+ const o=Object.fromEntries(new FormData(form)),r=calc(o);
+ $('#preview').innerHTML=`<b>Prévia:</b> ${r.horas.toFixed(1)}h • ${r.km.toFixed(1)} km • Receita ${money(r.receita)} • Despesas ${money(r.despesas)} • <b>Lucro ${money(r.lucro)}</b> • Lucro real estimado ${money(r.lucroReal)}`;
+}
+$('#formLanc').addEventListener('input',e=>updateLaunchPreview(e.currentTarget));
 $('#formLanc').onsubmit=async e=>{
  e.preventDefault(); const form=e.currentTarget,btn=form.querySelector('button[type="submit"]'); if(btn.disabled)return;
  const data=Object.fromEntries(new FormData(form)),r=calc(data);
@@ -38,7 +42,7 @@ $('#formLanc').onsubmit=async e=>{
  const fp=[data.data,data.inicio,data.fim,data.kmInicial,data.kmFinal,data.uber,data.noventaNove].join('|');
  if(localStorage.getItem('dc_last_save')===fp)return toast('Este lançamento já foi enviado.');
  const old=btn.textContent;
- try{btn.disabled=true;btn.textContent='Salvando...';await call('save',{row:r});localStorage.setItem('dc_last_save',fp);toast('Lançamento salvo! 🔥');if(r.lucroReal>=num(config.metaDiaria))celebrate();form.reset();form.data.value=new Date().toISOString().slice(0,10);['uber','noventaNove','extras','combustivel','litros','lavagem','estacionamento','manutencao','outros'].forEach(n=>form.elements[n].value=0);await load()}
+ try{btn.disabled=true;btn.textContent='Salvando...';await call('save',{row:r});localStorage.setItem('dc_last_save',fp);toast('Lançamento salvo! 🔥');if(r.lucroReal>=num(config.metaDiaria))celebrate();form.reset();form.data.value=new Date().toISOString().slice(0,10);['uber','noventaNove','extras','combustivel','litros','lavagem','estacionamento','manutencao','outros'].forEach(n=>form.elements[n].value=0);if(vehicle&&vehicle.kmAtual!==undefined)form.kmInicial.value=vehicle.kmAtual||'';updateLaunchPreview(form);await load()}
  catch(err){toast('Erro ao salvar: '+err.message)}
  finally{btn.disabled=false;btn.textContent=old}
 };
@@ -161,7 +165,23 @@ function updateJourney(){
   $('#startJourney').disabled=true;$('#stopJourney').disabled=false;
 }
 $('#startJourney').onclick=()=>{localStorage.setItem('dc_journey_start',Date.now());updateJourney();journeyInterval=setInterval(updateJourney,1000);toast('Jornada iniciada 🔥')};
-$('#stopJourney').onclick=()=>{let st=num(localStorage.getItem('dc_journey_start'));if(!st)return;let a=new Date(st),b=new Date(),fmt=d=>`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;let f=$('#formLanc');f.data.value=new Date().toISOString().slice(0,10);f.inicio.value=fmt(a);f.fim.value=fmt(b);localStorage.removeItem('dc_journey_start');clearInterval(journeyInterval);$('#journeyStatus').textContent='Jornada encerrada. Complete ganhos, KM e custos.';$('#startJourney').disabled=false;$('#stopJourney').disabled=true;updateJourney();document.querySelector('[data-page="novo"]').click();toast('Horários preenchidos automaticamente')};
+$('#stopJourney').onclick=()=>{
+ let st=num(localStorage.getItem('dc_journey_start'));if(!st)return;
+ let a=new Date(st),b=new Date(),fmt=d=>`${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+ let f=$('#formLanc');
+ f.reset();
+ f.data.value=new Date().toISOString().slice(0,10);
+ f.inicio.value=fmt(a);f.fim.value=fmt(b);
+ f.plataforma.value='Uber + 99';
+ if(vehicle&&vehicle.kmAtual!==undefined)f.kmInicial.value=vehicle.kmAtual||'';
+ ['uber','noventaNove','extras','combustivel','litros','lavagem','estacionamento','manutencao','outros'].forEach(n=>{if(f.elements[n])f.elements[n].value=0});
+ updateLaunchPreview(f);
+ localStorage.removeItem('dc_journey_start');clearInterval(journeyInterval);
+ $('#journeyStatus').textContent='Jornada encerrada. Complete ganhos, KM e custos.';
+ $('#startJourney').disabled=false;$('#stopJourney').disabled=true;updateJourney();
+ document.querySelector('[data-page="novo"]').click();
+ toast('Horários preenchidos automaticamente');
+};
 $('#formVehicle').onsubmit=async e=>{e.preventDefault();vehicle=Object.fromEntries(new FormData(e.currentTarget));try{await call('vehicle',{vehicle});toast('Veículo salvo 🚘');renderVehicle()}catch(err){toast(err.message)}};
 $('#formMaintenance').onsubmit=async e=>{
  e.preventDefault(); const form=e.currentTarget,btn=form.querySelector('button[type="submit"]'); if(btn.disabled)return;
@@ -178,6 +198,6 @@ $('#toggleApi').onclick=()=>$('#apiEditor').classList.toggle('api-hidden');
 loadDriverName();
 
 $('#today').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-$('#apiUrl').value=api();$('#formLanc').data.value=new Date().toISOString().slice(0,10);
+$('#apiUrl').value=api();$('#formLanc').data.value=new Date().toISOString().slice(0,10);updateLaunchPreview($('#formLanc'));
 try{config={...config,...JSON.parse(localStorage.getItem('dc_config')||'{}')}}catch{} fillConfig();load();
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));}

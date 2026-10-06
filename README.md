@@ -42,3 +42,11 @@ PWA básico, identificação do motorista, conexão amigável, validações e pr
 - Alertas visuais de meta, rentabilidade, combustível e manutenção
 - Comparação Uber x 99 permanece por receita; não inventa KM por plataforma
 - Alertas de desempenho usam histórico próprio quando há pelo menos 3 registros anteriores
+
+## V2.2.1 – Correção do piloto
+- Corrige prévia antiga após encerrar Jornada
+- Novo lançamento recebe somente os horários da jornada encerrada, sem reaproveitar valores anteriores
+- KM inicial usa o KM atual do veículo quando disponível
+- Jornada identifica os indicadores acumulados como Resultado de hoje
+- Dashboard identifica corretamente o indicador principal como Lucro real do período
+- Sem alteração no Code.gs, API ou estrutura das planilhas
