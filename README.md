@@ -65,3 +65,11 @@ PWA básico, identificação do motorista, conexão amigável, validações e pr
 - O KM atual calculado usa o maior valor entre cadastro do veículo e KM final dos lançamentos.
 - Saúde/manutenção continua usando esse KM efetivo mais recente.
 - Sem alteração em Code.gs, API ou estrutura das planilhas.
+
+## V2.3 – Push V1
+- Adiciona Ativar notificações em Metas.
+- Solicita permissão somente após ação explícita do motorista.
+- Adiciona Enviar teste usando o Service Worker/PWA.
+- Clique na notificação retorna ao DriveControl.
+- Esta etapa testa notificações locais do PWA; ainda não implementa servidor Web Push remoto nem promete entrega com o app fechado.
+- Não altera cálculos, Histórico, Jornada, KM, API ou planilhas.

@@ -197,7 +197,18 @@
         <button class="primary" type="submit">Salvar configurações</button>
       </form></article>
       <article class="form-card narrow"><h3>Conexão Google Sheets</h3><p class="hint">Cole abaixo a URL /exec da implantação do Apps Script. Ela fica salva somente neste navegador.</p>
-      <div class="api-status-card"><span id="apiFriendlyStatus">🔴 Base não configurada</span><button type="button" id="toggleApi" class="ghost">Trocar conexão</button></div><div class="api-row" id="apiEditor"><input id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec"><button id="saveApi" class="primary">Conectar</button></div></article>
+      <div class="api-status-card"><span id="apiFriendlyStatus">🔴 Base não configurada</span><button type="button" id="toggleApi" class="ghost">Trocar conexão</button></div><div class="api-row" id="apiEditor"><input id="apiUrl" placeholder="https://script.google.com/macros/s/.../exec"><button id="saveApi" class="primary">Conectar</button></div><div class="push-card">
+        <div>
+          <span class="eyebrow">NOTIFICAÇÕES</span>
+          <h3>Push no dispositivo</h3>
+          <p id="pushStatus">Verificando suporte...</p>
+        </div>
+        <div class="push-actions">
+          <button type="button" id="enablePush" class="primary">Ativar notificações</button>
+          <button type="button" id="testPush" class="ghost" disabled>Enviar teste</button>
+        </div>
+        <small>O Push V1 testa notificações locais do PWA. Nenhuma inscrição é enviada para a planilha nesta etapa.</small>
+      </div></article>
     </section>
   </main>
 </div>

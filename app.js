@@ -211,4 +211,54 @@ loadDriverName();
 $('#today').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
 $('#apiUrl').value=api();$('#formLanc').data.value=new Date().toISOString().slice(0,10);updateLaunchPreview($('#formLanc'));
 try{config={...config,...JSON.parse(localStorage.getItem('dc_config')||'{}')}}catch{} fillConfig();load();
+
+async function getSWRegistration(){
+ if(!('serviceWorker' in navigator))return null;
+ try{return await navigator.serviceWorker.ready}catch(e){return null}
+}
+function updatePushUI(){
+ const status=$('#pushStatus'),enable=$('#enablePush'),test=$('#testPush');
+ if(!status||!enable||!test)return;
+ if(!('Notification' in window)||!('serviceWorker' in navigator)){
+   status.textContent='Este navegador não oferece suporte às notificações do PWA.';
+   enable.disabled=true;test.disabled=true;return;
+ }
+ if(Notification.permission==='granted'){
+   status.textContent='🟢 Notificações permitidas neste dispositivo.';
+   enable.textContent='Notificações ativadas';enable.disabled=true;test.disabled=false;
+ }else if(Notification.permission==='denied'){
+   status.textContent='🔴 Permissão bloqueada no navegador. Libere nas configurações do site.';
+   enable.textContent='Permissão bloqueada';enable.disabled=true;test.disabled=true;
+ }else{
+   status.textContent='Notificações ainda não foram ativadas neste dispositivo.';
+   enable.textContent='Ativar notificações';enable.disabled=false;test.disabled=true;
+ }
+}
+async function enableNotifications(){
+ if(!('Notification' in window))return toast('Notificações não são suportadas neste navegador.');
+ try{
+   const permission=await Notification.requestPermission();
+   updatePushUI();
+   if(permission==='granted')toast('Notificações ativadas 🔔');
+   else if(permission==='denied')toast('Permissão de notificações bloqueada.');
+ }catch(e){toast('Não foi possível ativar notificações.')}
+}
+async function sendTestNotification(){
+ if(Notification.permission!=='granted')return updatePushUI();
+ const reg=await getSWRegistration();
+ if(!reg)return toast('Service Worker ainda não está pronto.');
+ const name=localStorage.getItem('dc_driver_name')||'Motorista';
+ await reg.showNotification('DriveControl 🔥',{
+   body:`Olá, ${name}! Notificações funcionando neste dispositivo.`,
+   tag:'drivecontrol-test',
+   renotify:false,
+   data:{url:'./'}
+ });
+ toast('Notificação de teste enviada 🔔');
+}
+const pushEnable=$('#enablePush'),pushTest=$('#testPush');
+if(pushEnable)pushEnable.onclick=enableNotifications;
+if(pushTest)pushTest.onclick=sendTestNotification;
+updatePushUI();
+
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}));}
