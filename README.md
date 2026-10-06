@@ -50,3 +50,10 @@ PWA básico, identificação do motorista, conexão amigável, validações e pr
 - Jornada identifica os indicadores acumulados como Resultado de hoje
 - Dashboard identifica corretamente o indicador principal como Lucro real do período
 - Sem alteração no Code.gs, API ou estrutura das planilhas
+
+## V2.2.2 – Correção definitiva do KM inicial
+- O KM inicial do novo lançamento usa o maior KM conhecido entre:
+  1. KM atual cadastrado no veículo;
+  2. KM final dos lançamentos já registrados.
+- Exemplo validado para o piloto: veículo cadastrado em 34.000 km + último lançamento em 34.150 km = próximo KM inicial 34.150.
+- Não altera cálculos financeiros, API, Apps Script ou estrutura das planilhas.

@@ -42,7 +42,7 @@ $('#formLanc').onsubmit=async e=>{
  const fp=[data.data,data.inicio,data.fim,data.kmInicial,data.kmFinal,data.uber,data.noventaNove].join('|');
  if(localStorage.getItem('dc_last_save')===fp)return toast('Este lançamento já foi enviado.');
  const old=btn.textContent;
- try{btn.disabled=true;btn.textContent='Salvando...';await call('save',{row:r});localStorage.setItem('dc_last_save',fp);toast('Lançamento salvo! 🔥');if(r.lucroReal>=num(config.metaDiaria))celebrate();form.reset();form.data.value=new Date().toISOString().slice(0,10);['uber','noventaNove','extras','combustivel','litros','lavagem','estacionamento','manutencao','outros'].forEach(n=>form.elements[n].value=0);if(vehicle&&vehicle.kmAtual!==undefined)form.kmInicial.value=vehicle.kmAtual||'';updateLaunchPreview(form);await load()}
+ try{btn.disabled=true;btn.textContent='Salvando...';await call('save',{row:r});localStorage.setItem('dc_last_save',fp);toast('Lançamento salvo! 🔥');if(r.lucroReal>=num(config.metaDiaria))celebrate();form.reset();form.data.value=new Date().toISOString().slice(0,10);['uber','noventaNove','extras','combustivel','litros','lavagem','estacionamento','manutencao','outros'].forEach(n=>form.elements[n].value=0);fillInitialKm(form);updateLaunchPreview(form);await load()}
  catch(err){toast('Erro ao salvar: '+err.message)}
  finally{btn.disabled=false;btn.textContent=old}
 };
@@ -84,6 +84,16 @@ function calcStreak(){
   let d=new Date(dates[0]+'T12:00:00');
   for(let i=0;i<dates.length;i++){let expected=d.toISOString().slice(0,10);if(dates[i]!==expected)break;streak++;d.setDate(d.getDate()-1)}
   return streak;
+}
+function latestKnownKm(){
+ const vehicleKm=num(vehicle&&vehicle.kmAtual);
+ const launchKm=(all||[]).reduce((max,r)=>Math.max(max,num(r.kmFinal)),0);
+ return Math.max(vehicleKm,launchKm);
+}
+function fillInitialKm(form=$('#formLanc')){
+ if(!form||!form.kmInicial)return;
+ const km=latestKnownKm();
+ form.kmInicial.value=km>0?km:'';
 }
 function todayRows(){const today=new Date().toISOString().slice(0,10);return all.map(calc).filter(r=>r.data===today)}
 function dailyStats(rows=todayRows()){
@@ -173,7 +183,7 @@ $('#stopJourney').onclick=()=>{
  f.data.value=new Date().toISOString().slice(0,10);
  f.inicio.value=fmt(a);f.fim.value=fmt(b);
  f.plataforma.value='Uber + 99';
- if(vehicle&&vehicle.kmAtual!==undefined)f.kmInicial.value=vehicle.kmAtual||'';
+ fillInitialKm(f);
  ['uber','noventaNove','extras','combustivel','litros','lavagem','estacionamento','manutencao','outros'].forEach(n=>{if(f.elements[n])f.elements[n].value=0});
  updateLaunchPreview(f);
  localStorage.removeItem('dc_journey_start');clearInterval(journeyInterval);
