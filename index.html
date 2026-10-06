@@ -43,6 +43,19 @@
         <div><span>RESULTADO DO PERÍODO</span><h2 id="heroLucro">R$ 0,00</h2><p id="heroSub">Lucro líquido operacional</p></div>
         <div class="goal"><span>Meta mensal</span><b id="goalText">0%</b><div class="bar"><i id="goalBar"></i></div></div>
       </div>
+      <article class="intel-card" id="intelCard">
+        <div class="intel-top"><div><span class="eyebrow">COPILOTO FINANCEIRO</span><h3 id="intelTitle">Aguardando dados de hoje</h3><p id="intelMessage">Registre sua jornada para receber análises do dia.</p></div><div class="intel-score" id="intelPct">0%</div></div>
+        <div class="intel-progress"><i id="intelBar"></i></div>
+        <div class="intel-grid">
+          <div><span>💰 Lucro real hoje</span><strong id="intelReal">R$ 0,00</strong></div>
+          <div><span>🎯 Falta para meta</span><strong id="intelMissing">R$ 0,00</strong></div>
+          <div><span>⏱ Lucro real / hora</span><strong id="intelHour">R$ 0,00</strong></div>
+          <div><span>🚗 Lucro real / km</span><strong id="intelKm">R$ 0,00</strong></div>
+          <div><span>🕘 Previsão da meta</span><strong id="intelEta">—</strong></div>
+          <div><span>📈 Projeção mensal</span><strong id="intelMonth">R$ 0,00</strong></div>
+        </div>
+        <div class="intel-verdict" id="intelVerdict">Comece a registrar para avaliar o dia.</div>
+      </article>
       <div class="vehicle-strip">
         <div><span>🚘 KM atual</span><strong id="vKmAtual">0 km</strong></div>
         <div><span>🔧 Próxima manutenção</span><strong id="vProxima">Cadastre o veículo</strong></div>
@@ -79,6 +92,12 @@
         <div class="journey-actions">
           <button class="primary" id="startJourney">▶ Iniciar jornada</button>
           <button class="danger-btn" id="stopJourney" disabled>■ Encerrar jornada</button>
+        </div>
+        <div class="journey-live">
+          <div><span>💰 Lucro real registrado</span><b id="journeyReal">R$ 0,00</b></div>
+          <div><span>🔥 Progresso da meta</span><b id="journeyPct">0%</b></div>
+          <div><span>🎯 Falta</span><b id="journeyMissing">R$ 0,00</b></div>
+          <div><span>🕘 Previsão</span><b id="journeyEta">—</b></div>
         </div>
         <div class="mini-goal"><span>Meta diária</span><b id="journeyGoal">R$ 200,00</b></div>
         <p class="hint">Ao encerrar, o horário inicial e final são enviados automaticamente para Novo lançamento.</p>
@@ -182,7 +201,7 @@
     </section>
   </main>
 </div>
-<div id="toast"></div>
+<div id="smartAlerts" class="smart-alerts"></div><div id="toast"></div>
 <div id="celebrate" class="celebrate"><div class="fire">🔥</div><h2>META BATIDA!</h2><p>Mandou bem! Resultado líquido do dia atingido.</p><div class="confetti">🎉 ✨ 🔥 🎊 ✨</div></div>
 <script src="app.js"></script>
 </body></html>

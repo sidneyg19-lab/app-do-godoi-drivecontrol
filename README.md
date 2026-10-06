@@ -31,3 +31,14 @@ V1 pessoal, sem autenticação multiusuário. Não use como SaaS público sem ad
 
 ## V2.1 Piloto
 PWA básico, identificação do motorista, conexão amigável, validações e proteção local contra reenvio duplicado.
+
+
+## V2.2 – Inteligência do Motorista
+- Copiloto financeiro no Dashboard
+- Lucro real (despesas + reserva por KM)
+- Progresso/falta da meta e previsão por ritmo atual
+- Projeção mensal baseada na média dos dias registrados
+- Painel inteligente da Jornada
+- Alertas visuais de meta, rentabilidade, combustível e manutenção
+- Comparação Uber x 99 permanece por receita; não inventa KM por plataforma
+- Alertas de desempenho usam histórico próprio quando há pelo menos 3 registros anteriores
